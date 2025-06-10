@@ -1,12 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
-using System.Collections;
-using static UnityEditor.Progress;
-using TMPro;
 using UnityEngine.Networking;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System;
 
@@ -14,9 +10,9 @@ namespace Assets.CodeBase.Gameplay.Services.BreedDog.Data
 {
     public class BreedDogServerDataProvider
     {
-        public async UniTask<IReadOnlyList<BreedId>> GetBreedIdsAsync(int maxCount = 10, CancellationToken cancellationToken = default)
+        public async UniTask<IReadOnlyList<BreedId>> GetBreedIdsAsync(CancellationToken cancellationToken = default)
         {
-            string url = "https://dogapi.dog/api/v2/breeds";
+            const string url = "https://dogapi.dog/api/v2/breeds";
 
             using var request = UnityWebRequest.Get(url);
             await request.SendWebRequest().ToUniTask(cancellationToken: cancellationToken);
@@ -37,23 +33,22 @@ namespace Assets.CodeBase.Gameplay.Services.BreedDog.Data
                 return Array.Empty<BreedId>();
             }
 
-            int count = Math.Min(maxCount, breedsArray.Count);
-            var breedIds = new List<BreedId>(count);
+            var breedIds = new List<BreedId>(breedsArray.Count);
 
-            for (int i = 0; i < count; i++)
+            foreach (JObject breedObj in breedsArray)
             {
-                JObject breedObj = (JObject)breedsArray[i];
                 string id = breedObj["id"]?.ToString();
                 string name = breedObj["attributes"]?["name"]?.ToString();
 
                 if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(name))
                 {
-                    breedIds.Add(new BreedId { Id = id, Name = name});
+                    breedIds.Add(new BreedId { Id = id, Name = name });
                 }
             }
 
             return breedIds;
         }
+
 
         public async UniTask<BreedData> GetBreedDetailsAsync(string breedId, CancellationToken cancellationToken = default)
         {

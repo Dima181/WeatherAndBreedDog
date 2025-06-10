@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using TMPro;
+﻿using TMPro;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using UnityEngine;

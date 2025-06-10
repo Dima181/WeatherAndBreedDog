@@ -1,4 +1,5 @@
 ﻿using Assets.CodeBase.Gameplay.Services.BreedDog.Data;
+using Assets.CodeBase.Gameplay.UI.BreedDog.Item;
 using Assets.CodeBase.Gameplay.UI.Weather;
 using Assets.CodeBase.UI.Core;
 using Cysharp.Threading.Tasks;
@@ -11,8 +12,9 @@ namespace Assets.CodeBase.Gameplay.UI.BreedDog
 {
     public class UIBreedDogScreenPresenter : UIScreenPresenter<UIBreedDogScreenView>
     {
+        [Inject] private readonly IFactory<BreedId, int, BreedItemView> _itemFactory;
+
         [Inject] private readonly BreedDogServerDataProvider _dataProvider;
-        [Inject] private DiContainer _container;
 
         protected override async UniTask BeforeShow(CompositeDisposable disposables)
         {
@@ -22,16 +24,11 @@ namespace Assets.CodeBase.Gameplay.UI.BreedDog
 
             for (int i = 0; i < breeds.Count; i++)
             {
-                string breedName = breeds[i].Id;
-                var cardInstance = UnityEngine.Object.Instantiate(_view.ItemPrefab, _view.RequiresContainer);
+                var breed = breeds[i];
+                var card = _itemFactory.Create(breed, i + 1);
 
-                _container.Inject(cardInstance);
-
-                cardInstance.BreedId = breeds[i];
-                cardInstance.TextNumber.text = (i + 1).ToString();
-                cardInstance.TextName.text = breeds[i].Name;
-
-                _view.ItemList.Add(cardInstance.GetComponent<RectTransform>());
+                card.transform.SetParent(_view.RequiresContainer, false);
+                _view.ItemList.Add(card.GetComponent<RectTransform>());
             }
 
             _view.OnExitButtonClick
@@ -41,6 +38,7 @@ namespace Assets.CodeBase.Gameplay.UI.BreedDog
                 })
                 .AddTo(disposables);
         }
+
 
         private void ClearPreviousCards()
         {

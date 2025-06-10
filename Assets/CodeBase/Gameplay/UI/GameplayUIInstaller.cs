@@ -3,7 +3,6 @@ using Assets.CodeBase.Gameplay.UI.HUD;
 using Assets.CodeBase.Gameplay.UI.Popups.BreedDog;
 using Assets.CodeBase.Gameplay.UI.Weather;
 using Assets.CodeBase.UI;
-using UnityEngine;
 
 namespace Assets.CodeBase.Gameplay.UI
 {

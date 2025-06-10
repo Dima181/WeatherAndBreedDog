@@ -19,13 +19,24 @@ namespace Assets.CodeBase.Gameplay.UI.BreedDog.Item
 
         [field: SerializeField] public TextMeshProUGUI TextNumber { get; set; }
         [field: SerializeField] public TextMeshProUGUI TextName { get; set; }
-
-        public BreedId BreedId { get; set; }
-
         public IObservable<Unit> OnOpenPopoupClicked => _openPopupButton.OnClickAsObservable();
+        public BreedId BreedId { get; set; }
 
         [SerializeField] private Button _openPopupButton;
         [SerializeField] public GameObject _loadingIcon;
+
+        public void Construct(BreedId breedId, int index)
+        {
+            BreedId = breedId;
+            TextNumber.text = index.ToString();
+            TextName.text = breedId.Name;
+        }
+        
+        private void OnValidate()
+        {
+            if (_openPopupButton == null)
+                _openPopupButton = GetComponent<Button>();
+        }
 
         private void Awake()
         {
@@ -46,10 +57,19 @@ namespace Assets.CodeBase.Gameplay.UI.BreedDog.Item
                 .AddTo(this);
         }
 
-        private void OnValidate()
+        public class Pool : MonoMemoryPool<BreedItemView>
         {
-            if (_openPopupButton == null)
-                _openPopupButton = GetComponent<Button>();
+            protected override void OnSpawned(BreedItemView item)
+            {
+                base.OnSpawned(item);
+                item.gameObject.SetActive(true);
+            }
+
+            protected override void OnDespawned(BreedItemView item)
+            {
+                base.OnDespawned(item);
+                item.gameObject.SetActive(false);
+            }
         }
     }
 }
